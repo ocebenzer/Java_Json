@@ -99,21 +99,8 @@ public class JsonObject {
 
     @Override
     public String toString() {
-        switch (this.type) {
-            case array:
-                return this.value_array.toString();
-            case object:
-                return this.value_object.toString();
-            case bool:
-                return Boolean.toString(this.value_boolean);
-            case string:
-                return this.value_string;
-            case number_int:
-                return Integer.toString(this.value_int);
-            case number_double:
-                return Double.toString(this.value_int);
-            default:
-                return "";
-        }
+        return this.type != null
+            ? this.getValue().toString()
+            : "";
     }
 }
