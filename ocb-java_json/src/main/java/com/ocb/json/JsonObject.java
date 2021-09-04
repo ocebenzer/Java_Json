@@ -32,7 +32,7 @@ public class JsonObject {
      * @param type
      * @throws Exception
      */
-    public JsonObject(JsonTypes type) throws Exception {
+    private JsonObject(JsonTypes type) throws Exception {
         this.type = type;
         Object value;
         switch (this.type) {
@@ -68,18 +68,8 @@ public class JsonObject {
      * @throws Exception
      */
     public JsonObject(String type, Object value) throws Exception {
-        this(JsonTypes.valueOf(type), value);
-    }
-
-    /**
-     * Creates a JsonObject with given type and value
-     * @param type
-     * @param value
-     * @throws Exception
-     */
-    public JsonObject(JsonTypes type, Object value) throws Exception {
-        this.type = type;
-        this.setValue(type, value);
+        this.type = JsonTypes.valueOf(type);
+        this.setValue(this.type, value);
     }
 
     /**
@@ -138,7 +128,7 @@ public class JsonObject {
      * @throws Exception
      */
     public JsonObject(Boolean value) throws Exception {
-        this(JsonTypes.bool, value);
+        this("bool", value);
     }
 
     /**
@@ -148,7 +138,7 @@ public class JsonObject {
      * @throws Exception
      */
     public JsonObject(String value) throws Exception {
-        this(JsonTypes.string, value);
+        this("string", value);
     }
 
     /**
@@ -158,7 +148,7 @@ public class JsonObject {
      * @throws Exception
      */
     public JsonObject(int value) throws Exception {
-        this(JsonTypes.number_int, value);
+        this("number_int", value);
     }
 
     /**
@@ -168,7 +158,7 @@ public class JsonObject {
      * @throws Exception
      */
     public JsonObject(double value) throws Exception {
-        this(JsonTypes.number_double, value);
+        this("number_double", value);
     }
 
     /**
@@ -212,7 +202,7 @@ public class JsonObject {
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
-    public void setValue(JsonTypes type, Object value) throws Exception {
+    private void setValue(JsonTypes type, Object value) throws Exception {
         if (this.type != type) {
             this.setValue(type, null);
             this.type = type;
