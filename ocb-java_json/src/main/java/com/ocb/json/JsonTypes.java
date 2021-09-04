@@ -1,11 +1,13 @@
 package com.ocb.json;
 
 enum JsonTypes {
-    array,
     object,
+    array,
 
     bool,
     string,
     number_int,
-    number_double;
+    number_double,
+
+    _null;
 }

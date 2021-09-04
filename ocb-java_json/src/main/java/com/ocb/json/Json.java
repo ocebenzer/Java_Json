@@ -2,7 +2,7 @@ package com.ocb.json;
 
 public class Json {
     
-    public static JsonObject parse(String string) {
+    public static JsonObject parse(String string) throws Exception {
         return new JsonObject(JsonTypes.object);
     }
 

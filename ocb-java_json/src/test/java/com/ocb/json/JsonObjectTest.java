@@ -26,6 +26,10 @@ class JsonObjectTest {
         jsonInt,
         bigJson;
 
+    static String addQuotes(String string) {
+        return "\"" + string + "\"";
+    }
+
     @BeforeAll
     static void initializeTests() throws Exception {
         jsonArray = new JsonObject("array", array);
@@ -42,29 +46,29 @@ class JsonObjectTest {
 
     @Test
     void constructors() {
-        assertEquals(jsonArray.getValue(), array);
-        assertEquals(jsonObject.getValue(), object);
+        assertEquals(array, jsonArray.getValue());
+        assertEquals(object, jsonObject.getValue());
 
-        assertEquals(jsonBool.getValue(), bool);
-        assertEquals(jsonString.getValue(), string);
-        assertEquals(jsonDouble.getValue(), number_double);
-        assertEquals(jsonInt.getValue(), number_int);
+        assertEquals(bool, jsonBool.getValue());
+        assertEquals(string, jsonString.getValue());
+        assertEquals(number_double, jsonDouble.getValue());
+        assertEquals(number_int, jsonInt.getValue());
     }
 
     @Test
     void tostringfunctions() {
-        assertEquals(jsonArray.toString(), "[]");
-        assertEquals(jsonObject.toString(), "{}");
+        assertEquals("[]", jsonArray.toString());
+        assertEquals("{}", jsonObject.toString());
 
-        assertEquals(jsonBool.toString(), Boolean.toString(bool));
-        assertEquals(jsonString.toString(), string);
-        assertEquals(jsonDouble.toString(), Double.toString(number_double));
-        assertEquals(jsonInt.toString(), Integer.toString(number_int));
+        assertEquals(Boolean.toString(bool), jsonBool.toString());
+        assertEquals(addQuotes(string),jsonString.toString());
+        assertEquals(Double.toString(number_double), jsonDouble.toString());
+        assertEquals(Integer.toString(number_int), jsonInt.toString());
     }
 
     @Test
     void getchildfunctions() throws Exception {
         System.out.println(bigJson);
-        assertEquals(bigJson.getChild(0), jsonArray);
+        assertEquals(jsonArray, bigJson.getChild(0));
     }
 }
