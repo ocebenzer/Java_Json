@@ -1,19 +1,13 @@
 package com.ocb.json;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
+import java.util.Arrays;
 
 public class JsonObject {
 
     private JsonTypes type;
-
-    private ArrayList<JsonObject> value_array;
-    private HashMap<String, JsonObject> value_object;
-
-    private boolean value_boolean;
-    private String value_string;
-    private int value_int;
-    private double value_double;
+    private Object value;
 
     public JsonObject(JsonTypes type) {
         this.type = type;
@@ -28,25 +22,25 @@ public class JsonObject {
         this.setValue(type, value);
     }
 
-    public Object getValue() {
-        switch (this.type) {
-            case array:
-                return value_array;
-            case object:
-                return value_object;
-            case bool:
-                return this.value_boolean;
-            case string:
-                return value_string;
-            case number_int:
-                return this.value_int;
-            case number_double:
-                return this.value_double;
-            default:
-                return null;
-        }
+    public JsonObject(Map<String, JsonObject> value) throws Exception {
+        this.type = JsonTypes.object;
+        this.setValue(this.type, value);
     }
 
+    public JsonObject(List<JsonObject> value) throws Exception {
+        this.type = JsonTypes.array;
+        this.setValue(this.type, value);
+    }
+    public JsonObject(JsonObject[] value) throws Exception {
+        this.type = JsonTypes.array;
+        this.setValue(this.type, Arrays.asList(value));
+    }
+
+    public Object getValue() {
+        return this.value;
+    }
+
+    @SuppressWarnings("unchecked")
     public void setValue(JsonTypes type, Object value) throws Exception {
         if (this.type != type) {
             this.setValue(type, null);
@@ -56,22 +50,22 @@ public class JsonObject {
         try{
             switch (this.type) {
                 case array:
-                    this.value_array = (ArrayList<JsonObject>)value;
+                    this.value = (List<JsonObject>)value;
                     break;
                 case object:
-                    this.value_object = (HashMap<String, JsonObject>)value;
+                    this.value = (Map<String, JsonObject>)value;
                     break;
                 case bool:
-                    this.value_boolean = (boolean)value;
+                    this.value = (boolean)value;
                     break;
                 case string:
-                    this.value_string = (String)value;
+                    this.value = (String)value;
                     break;
                 case number_int:
-                    this.value_int = (int)value;
+                    this.value = (int)value;
                     break;
                 case number_double:
-                    this.value_double = (double)value;
+                    this.value = (double)value;
                     break;
                 default:
                     throw new Exception("Json type is not defined");
@@ -85,16 +79,26 @@ public class JsonObject {
         return this.getChild(Integer.toString(key));
     }
 
+    @SuppressWarnings("unchecked")
     public JsonObject getChild(String key) throws Exception {
         switch (this.type) {
-            case object:
-                return this.value_object.get(key);
             case array:
                 int index = Integer.parseInt(key);
-                return this.value_array.get(index);
+                return ((List<JsonObject>)this.value).get(index);
+            case object:
+                return ((Map<String, JsonObject>)this.value).get(key);
             default:
                 throw new Exception("Couldn't find a child with key: " + key + " in Json type " + this.type);
         }
+    }
+
+    public JsonObject getChild(String[] keys) throws Exception{
+        JsonObject current = this;
+
+        for (String key : keys) {
+            current = this.getChild(key);
+        }
+        return current;
     }
 
     @Override

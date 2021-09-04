@@ -1,6 +1,6 @@
 package com.ocb.json;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -8,25 +8,26 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-class AppTest {
+class JsonObjectTest {
 
-    ArrayList<JsonObject> array = new ArrayList<JsonObject>();
-    HashMap<String, JsonObject> object = new HashMap<String, JsonObject>();
+    static ArrayList<JsonObject> array = new ArrayList<JsonObject>();
+    static HashMap<String, JsonObject> object = new HashMap<String, JsonObject>();
     
-    boolean bool = true;
-    String string = "Hello I am a string";
-    double number_double = 3.14;
-    int number_int = 42;
+    static boolean bool = true;
+    static String string = "Hello I am a string";
+    static double number_double = 3.14;
+    static int number_int = 42;
 
-    JsonObject jsonArray,
+    static JsonObject jsonArray,
         jsonObject,
         jsonBool,
         jsonString,
         jsonDouble,
-        jsonInt;
+        jsonInt,
+        bigJson;
 
-    @BeforeEach
-    void initializeTests() throws Exception {
+    @BeforeAll
+    static void initializeTests() throws Exception {
         jsonArray = new JsonObject("array", array);
         jsonObject = new JsonObject("object", object);
 
@@ -34,6 +35,9 @@ class AppTest {
         jsonString = new JsonObject("string", string);
         jsonDouble = new JsonObject("number_double", number_double);
         jsonInt = new JsonObject("number_int", number_int);
+
+        JsonObject[] values = { jsonArray, jsonObject, jsonBool, jsonString, jsonDouble, jsonInt };
+        bigJson = new JsonObject(values);
     }
 
     @Test
@@ -48,7 +52,7 @@ class AppTest {
     }
 
     @Test
-    void tostrings() {
+    void tostringfunctions() {
         assertEquals(jsonArray.toString(), "[]");
         assertEquals(jsonObject.toString(), "{}");
 
@@ -56,5 +60,11 @@ class AppTest {
         assertEquals(jsonString.toString(), string);
         assertEquals(jsonDouble.toString(), Double.toString(number_double));
         assertEquals(jsonInt.toString(), Integer.toString(number_int));
+    }
+
+    @Test
+    void getchildfunctions() throws Exception {
+        System.out.println(bigJson);
+        assertEquals(bigJson.getChild(0), jsonArray);
     }
 }
