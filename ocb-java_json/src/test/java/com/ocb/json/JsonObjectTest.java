@@ -26,10 +26,6 @@ class JsonObjectTest {
         jsonInt,
         bigJson;
 
-    static String addQuotes(String string) {
-        return "\"" + string + "\"";
-    }
-
     @BeforeAll
     static void initializeTests() throws Exception {
         jsonArray = new JsonObject("array", array);
@@ -61,7 +57,7 @@ class JsonObjectTest {
         assertEquals("{}", jsonObject.toString());
 
         assertEquals(Boolean.toString(bool), jsonBool.toString());
-        assertEquals(addQuotes(string),jsonString.toString());
+        assertEquals(JsonHelpers.addQuotes(string),jsonString.toString());
         assertEquals(Double.toString(number_double), jsonDouble.toString());
         assertEquals(Integer.toString(number_int), jsonInt.toString());
     }

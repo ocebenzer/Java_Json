@@ -7,8 +7,6 @@ public final class App {
     }
 
     public static void main(String[] args) throws Exception {
-        Json.parse("[null,0,0.0]");
-        /*
         JsonObject testObject = new JsonObject();
         testObject.addChild("key", new JsonObject("Hello my JSON library!"));
 
@@ -33,7 +31,16 @@ public final class App {
         Object[] value = { 0, true, 0.0, new JsonObject(nestedDict), new JsonObject("array") };
         testObject.addChild("value", new JsonObject(value));
 
+
+
+        JsonObject arr = Json.parse("  [  null  ,  42  ,  3.14  ,  [  true  ,  false  ] ,  \n \"foo\"  ]  ");
+        JsonObject obj = Json.parse("  {    key : \"  arr  \"  ,  \"value\"   :   ${arr}  }   ".replace("${arr}", arr.toString()));
+
+        System.out.println();
         System.out.println(testObject);
-        */
+        System.out.println();
+        System.out.println(obj);
+        System.out.println(arr);
+        System.out.println();
     }
 }
