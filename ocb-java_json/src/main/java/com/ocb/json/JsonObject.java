@@ -21,7 +21,6 @@ public class JsonObject {
 
     /**
      * Creates an empty JsonObject with default type "object"
-     * @throws Exception
      */
     public JsonObject() throws Exception {
         this(JsonTypes.object);
@@ -30,7 +29,6 @@ public class JsonObject {
     /**
      * Creates a JsonObject with default value based on given type
      * @param type
-     * @throws Exception
      */
     private JsonObject(JsonTypes type) throws Exception {
         this.type = type;
@@ -65,7 +63,7 @@ public class JsonObject {
      * Creates a JsonObject with given type and value
      * @param type
      * @param value
-     * @throws Exception
+     * @throws Exception if given type-value is invalid
      */
     public JsonObject(String type, Object value) throws Exception {
         this.type = JsonTypes.valueOf(type);
@@ -76,7 +74,6 @@ public class JsonObject {
      * Creates a JsonObject with type "object"
      * @param type
      * @param value
-     * @throws Exception
      */
     public JsonObject(Map<String, JsonObject> value) throws Exception {
         this.type = JsonTypes.object;
@@ -87,7 +84,6 @@ public class JsonObject {
      * Creates a JsonObject with type "array"
      * @param type
      * @param value
-     * @throws Exception
      */
     public JsonObject(List<JsonObject> value) throws Exception {
         this.type = JsonTypes.array;
@@ -97,9 +93,9 @@ public class JsonObject {
     /**
      * Creates a JsonObject with type "array"
      * @param type
-     * @param values array of values
-     * @throws Exception
-     * @implNote all elements of values must be one of: [boolean, string, int, double, JsonObject]
+     * @param values Array of values
+     * @throws Exception if a given value is invalid
+     * @implNote all elements of values must be one of: [boolean, String, int, double, JsonObject]
      */
     public JsonObject(Object[] values) throws Exception {
         this.type = JsonTypes.array;
@@ -125,7 +121,6 @@ public class JsonObject {
      * Creates a JsonObject with type "bool"
      * @param type
      * @param value
-     * @throws Exception
      */
     public JsonObject(Boolean value) throws Exception {
         this("bool", value);
@@ -135,7 +130,6 @@ public class JsonObject {
      * Creates a JsonObject with type "string"
      * @param type
      * @param value
-     * @throws Exception
      */
     public JsonObject(String value) throws Exception {
         this("string", value);
@@ -145,7 +139,6 @@ public class JsonObject {
      * Creates a JsonObject with type "number_int"
      * @param type
      * @param value
-     * @throws Exception
      */
     public JsonObject(int value) throws Exception {
         this("number_int", value);
@@ -155,7 +148,6 @@ public class JsonObject {
      * Creates a JsonObject with type "number_double"
      * @param type
      * @param value
-     * @throws Exception
      */
     public JsonObject(double value) throws Exception {
         this("number_double", value);
@@ -171,7 +163,6 @@ public class JsonObject {
     /**
      * Set a new "object" value to the JsonObject
      * @param value
-     * @throws Exception
      */
     public void setValue(Map<String, JsonObject> value) throws Exception {
         this.setValue(JsonTypes.object, value);
@@ -180,7 +171,6 @@ public class JsonObject {
     /**
      * Set a new "array" value to the JsonObject
      * @param value
-     * @throws Exception
      */
     public void setValue(List<JsonObject> value) throws Exception {
         this.setValue(JsonTypes.array, value);
@@ -189,7 +179,6 @@ public class JsonObject {
     /**
      * Set a new "array" value to the JsonObject
      * @param value
-     * @throws Exception
      */
     public void setValue(JsonObject[] value) throws Exception {
         this.setValue(JsonTypes.array, value);
@@ -199,7 +188,7 @@ public class JsonObject {
      * Set a new type and value to the JsonObject
      * @param type
      * @param value
-     * @throws Exception
+     * @throws Exception if given type-value is invalid
      */
     @SuppressWarnings("unchecked")
     private void setValue(JsonTypes type, Object value) throws Exception {
@@ -239,8 +228,7 @@ public class JsonObject {
     /**
      * Add a JsonObject to current value
      * @param value
-     * @throws Exception
-     * @implNote assumes current type is "array"
+     * @throws Exception if current type is not an Array
      */
     @SuppressWarnings("unchecked")
     public void addChild(JsonObject value) throws Exception {
@@ -255,8 +243,7 @@ public class JsonObject {
     /**
      * Add a key-JsonObject pair to current value
      * @param value
-     * @throws Exception
-     * @implNote assumes current type is "object"
+     * @throws Exception if current type is not an Object
      */
     @SuppressWarnings("unchecked")
     public void addChild(String key, JsonObject value) throws Exception {
@@ -269,26 +256,28 @@ public class JsonObject {
     }
 
     /**
-     * @param key
-     * @return related JsonObject of given key 
-     * @throws Exception
-     * @implNote assumes current type is "array"
+     * @param index
+     * @return related JsonObject of given index 
+     * @throws Exception if current type is not an Array
      */
-    public JsonObject getChild(int key) throws Exception {
-        return this.getChild(Integer.toString(key));
+    @SuppressWarnings("unchecked")
+    public JsonObject getChild(int index) throws Exception {
+        if (this.type == JsonTypes.array) {
+            return ((List<JsonObject>) this.value).get(index);
+        }
+        throw new Exception("JsonObject type is not an array");
     }
 
     /**
      * @param key
-     * @return related JsonObject of given key 
-     * @throws Exception
+     * @return related JsonObject of given key
+     * @throws Exception if current type is neither an Object nor an Array
      */
     @SuppressWarnings("unchecked")
     public JsonObject getChild(String key) throws Exception {
         switch (this.type) {
             case array:
-                int index = Integer.parseInt(key);
-                return ((List<JsonObject>) this.value).get(index);
+                return this.getChild(Integer.parseInt(key));
             case object:
                 return ((Map<String, JsonObject>) this.value).get(key);
             default:
@@ -299,15 +288,36 @@ public class JsonObject {
     /**
      * @param key
      * @return related JsonObject of given keys
-     * @throws Exception
-     * @apiNote keys array is called recursively
+     * @throws Exception if a key is neither a String nor an int
+     * @apiNote each key in keys[] is called iteratively, be careful while using
      */
-    public JsonObject getChild(String[] keys) throws Exception{
+    public JsonObject getChild(Object... keys) throws Exception{
         JsonObject current = this;
-        for (String key : keys) {
-            current = this.getChild(key);
+        for (Object key : keys) {
+            String keyType = key.getClass().getName();
+
+            switch (keyType) {
+                case "java.lang.String":
+                    current = current.getChild((String) key);
+                    break;
+                case "java.lang.Integer":
+                    current = current.getChild((Integer) key);
+                    break;
+                default:
+                    throw new Exception("Unknown key type " + keyType);
+            }
         }
         return current;
+    }
+
+    /**
+     * Deeply check if two JsonObjects are equal
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof JsonObject) || this.type != ((JsonObject) obj).type) return false;
+
+        return this.toString().equals(obj.toString());
     }
 
     /**

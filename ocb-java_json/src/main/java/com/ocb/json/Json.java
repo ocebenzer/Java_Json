@@ -22,13 +22,13 @@ public class Json {
         return parse(scanner);
     }
 
-    public static JsonObject parse(Scanner scanner) throws Exception {
+    private static JsonObject parse(Scanner scanner) throws Exception {
         scanner.skip("\\s*");
         String token = scanner.next();
         token = token.strip();
 
         // if null
-        if (token.matches("null")) return new JsonObject("null");
+        if (token.matches("null")) return new JsonObject("_null", "null");
         // if double
         if (token.matches("\\d+\\.\\d+")) return new JsonObject("number_double", Double.parseDouble(token));
         // if int
@@ -46,14 +46,14 @@ public class Json {
         throw new Exception("Couldn't parse token: \"$\"".replace("$", token));
     }
 
-    public static JsonObject parseObject(Scanner scanner) throws Exception {
+    private static JsonObject parseObject(Scanner scanner) throws Exception {
         HashMap<String,JsonObject> values = new HashMap<String,JsonObject>();
 
         String token = "";
 
         while (scanner.hasNext()) {
             scanner.skip("\\s*");
-            String key = scanner.next();
+            String key = scanner.next().trim();
             if (JsonHelpers.hasQuotes(key)) key = JsonHelpers.removeQuotes(key);
             scanner.skip("\\s*");
             token = scanner.next();
@@ -71,10 +71,10 @@ public class Json {
             }
         }
 
-        throw new Exception("Couldn't parse token: \"$\"".replace("$", token));
+        throw new Exception("Couldn't parse string, stuck at: \"$\"".replace("$", token));
     }
 
-    public static JsonObject parseArray(Scanner scanner) throws Exception {
+    private static JsonObject parseArray(Scanner scanner) throws Exception {
         ArrayList<JsonObject> values = new ArrayList<JsonObject>();
 
         String token = "";
@@ -95,6 +95,6 @@ public class Json {
             }
         }
 
-        throw new Exception("Couldn't parse token: \"$\"".replace("$", token));
+        throw new Exception("Couldn't parse string, stuck at: \"$\"".replace("$", token));
     }
 }
